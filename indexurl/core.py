@@ -36,7 +36,13 @@ def get_index_url() -> str:
         # Site
         Path(virtual_env, "pip.conf") if virtual_env else None,
         # User
-        Path(appdirs.user_config_dir("pip"), "pip.conf"),  # omit some Mac logic
+        (
+            # These look the same at first glance but they're not on Mac.  See
+            # the doc for this complex logic involving whether the _dir_ exists.
+            Path(appdirs.user_config_dir("pip"), "pip.conf")
+            if Path(appdirs.user_config_dir("pip")).exists()
+            else Path("~/.config/pip/pip.conf").expanduser()
+        ),
         # Global
         Path("/etc/pip.conf"),
         *(Path(d, "pip", "pip.conf") for d in xdg_config_dirs),
