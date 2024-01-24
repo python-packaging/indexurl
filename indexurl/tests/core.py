@@ -44,7 +44,7 @@ class IndexUrlTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             Path(d, "pip.conf").write_text("[global]\nindex-url=a\n")
             Path(d, "pip.t").write_text("[global]\nindex-url=t\n")
-            with patch_env("PIP_CONFIG_FILE", str(Path(d, "pip.t"))):
+            with patch_env("PIP_CONFIG_FILE", str(Path(d, "pip.t"))), patch_env("HOME", "/foo"):
                 self.assertEqual("t", get_index_url())
                 with patch_env("VIRTUAL_ENV", d):
                     self.assertEqual("a", get_index_url())
@@ -62,7 +62,7 @@ class IndexUrlTest(unittest.TestCase):
     # This one only makes sense on *nix
     def test_xdg_config_dirs(self) -> None:
         with tempfile.TemporaryDirectory() as d:
-            with patch_env("XDG_CONFIG_DIRS", f"{d},"):
+            with patch_env("XDG_CONFIG_DIRS", f"{d},"), patch_env("HOME", "/foo"):
                 Path(d, "pip").mkdir()
                 Path(d, "pip", "pip.conf").write_text("[global]\nindex-url=a\n")
                 self.assertEqual("a", get_index_url())
