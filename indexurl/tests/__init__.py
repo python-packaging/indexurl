@@ -1,5 +1,5 @@
-# from .foo import FooTest
+from .core import IndexUrlTest
 
 __all__ = [
-    # "FooTest",
+    "IndexUrlTest",
 ]

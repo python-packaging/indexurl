@@ -1,6 +1,12 @@
 # indexurl
 
+This is a super-simple project to read the global.index-url config value of pip
+without extra processes.
 
+```py
+from indexurl import get_index_url
+print(get_index_url())
+```
 
 # License
 
