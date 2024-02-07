@@ -20,7 +20,7 @@ def get_index_url() -> str:
     place, normalizes the trailing slash away, and doesn't require another
     process or pip to be installed.
     """
-    pip_config_file = os.getenv("PIP_CONFIG_FILE")
+    pip_config_file = os.environ.get("PIP_CONFIG_FILE")
     if pip_config_file == "os.devnull":
         return DEFAULT_INDEX_URL
 
@@ -44,9 +44,9 @@ def _get_possible_config_locations() -> List[Path]:
     # the code above can stop once an entry is found, rather than having to
     # apply overrides.
 
-    virtual_env = os.getenv("VIRTUAL_ENV")
-    pip_config_file = os.getenv("PIP_CONFIG_FILE")
-    xdg_config_dirs = os.getenv("XDG_CONFIG_DIRS", "").split(",")
+    virtual_env = os.environ.get("VIRTUAL_ENV")
+    pip_config_file = os.environ.get("PIP_CONFIG_FILE")
+    xdg_config_dirs = os.environ.get("XDG_CONFIG_DIRS", "").split(",")
     if pip_config_file == "os.devnull":
         pip_config_file = ""
 
