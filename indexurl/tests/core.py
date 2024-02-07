@@ -5,7 +5,11 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
 
-from ..core import _get_global_index_url_from_file, get_index_url
+from ..core import (
+    _get_global_index_url_from_file,
+    _get_possible_config_locations,
+    get_index_url,
+)
 
 
 @contextmanager
@@ -44,7 +48,9 @@ class IndexUrlTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             Path(d, "pip.conf").write_text("[global]\nindex-url=a\n")
             Path(d, "pip.t").write_text("[global]\nindex-url=t\n")
-            with patch_env("PIP_CONFIG_FILE", str(Path(d, "pip.t"))), patch_env("HOME", "/foo"):
+            with patch_env("PIP_CONFIG_FILE", str(Path(d, "pip.t"))), patch_env(
+                "HOME", "/foo"
+            ):
                 self.assertEqual("t", get_index_url())
                 with patch_env("VIRTUAL_ENV", d):
                     self.assertEqual("a", get_index_url())
@@ -72,3 +78,34 @@ class IndexUrlTest(unittest.TestCase):
             "HOME", ""
         ), patch_env("XDG_CONFIG_HOME", ""), patch_env("PIP_CONFIG_FILE", ""):
             self.assertEqual("https://pypi.org/simple", get_index_url())
+
+    def test_get_possible_config_locations(self) -> None:
+        with patch_env("VIRTUAL_ENV", "/foo"), patch_env(
+            "PIP_CONFIG_FILE", "/bar/pip.conf"
+        ), patch_env("XDG_CONFIG_DIRS", "/a,/b"), patch_env("HOME", "/home2"):
+            self.assertEqual(
+                [
+                    Path("/foo/pip.conf"),
+                    Path("/home2/.config/pip/pip.conf"),
+                    Path("/etc/pip.conf"),
+                    Path("/a/pip/pip.conf"),
+                    Path("/b/pip/pip.conf"),
+                    Path("/bar/pip.conf"),
+                ],
+                _get_possible_config_locations(),
+            )
+
+    def test_get_possible_config_locations_devnull(self) -> None:
+        with patch_env("VIRTUAL_ENV", "/foo"), patch_env(
+            "PIP_CONFIG_FILE", "os.devnull"
+        ), patch_env("XDG_CONFIG_DIRS", "/a,/b"), patch_env("HOME", "/home2"):
+            self.assertEqual(
+                [
+                    Path("/foo/pip.conf"),
+                    Path("/home2/.config/pip/pip.conf"),
+                    Path("/etc/pip.conf"),
+                    Path("/a/pip/pip.conf"),
+                    Path("/b/pip/pip.conf"),
+                ],
+                _get_possible_config_locations(),
+            )
