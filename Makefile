@@ -1,9 +1,10 @@
 PYTHON?=python
 SOURCES=indexurl setup.py
+UV?=uv
 
 .PHONY: venv
 venv:
-	$(PYTHON) -m venv .venv
+	$(UV) venv .venv
 	source .venv/bin/activate && make setup
 	@echo 'run `source .venv/bin/activate` to use virtualenv'
 
@@ -12,7 +13,7 @@ venv:
 
 .PHONY: setup
 setup:
-	python -m pip install -Ue .[dev,test]
+	uv pip install -e .[dev,test]
 
 .PHONY: test
 test:
@@ -29,9 +30,3 @@ lint:
 	python -m flake8 $(SOURCES)
 	python -m checkdeps --allow-names indexurl indexurl
 	mypy --strict --install-types --non-interactive indexurl
-
-.PHONY: release
-release:
-	rm -rf dist
-	python setup.py sdist bdist_wheel
-	twine upload dist/*

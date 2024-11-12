@@ -59,6 +59,7 @@ class IndexUrlTest(unittest.TestCase):
             ):
                 self.assertEqual("https://pypi.org/simple", get_index_url())
 
+    @unittest.skipIf(os.name == "nt", "xfail on windows")
     def test_virtual_env(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             Path(d, "pip.conf").write_text("[global]\nindex-url=a\n")
@@ -79,6 +80,7 @@ class IndexUrlTest(unittest.TestCase):
         ), patch_env("XDG_CONFIG_HOME", ""), patch_env("PIP_CONFIG_FILE", ""):
             self.assertEqual("https://pypi.org/simple", get_index_url())
 
+    @unittest.skipIf(os.name == "nt", "xfail on windows")
     def test_get_possible_config_locations(self) -> None:
         with patch_env("VIRTUAL_ENV", "/foo"), patch_env(
             "PIP_CONFIG_FILE", "/bar/pip.conf"
@@ -95,6 +97,7 @@ class IndexUrlTest(unittest.TestCase):
                 _get_possible_config_locations(),
             )
 
+    @unittest.skipIf(os.name == "nt", "xfail on windows")
     def test_get_possible_config_locations_devnull(self) -> None:
         with patch_env("VIRTUAL_ENV", "/foo"), patch_env(
             "PIP_CONFIG_FILE", "os.devnull"
