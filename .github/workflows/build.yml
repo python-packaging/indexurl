@@ -35,7 +35,7 @@ jobs:
         run: make test
       - name: Lint
         run: make lint
-        unless: matrix.python-version == "3.9"
+        if: ${{ matrix.python-version != "3.9" }}
 
   build:
     needs: test
